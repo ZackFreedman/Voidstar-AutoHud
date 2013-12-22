@@ -15,6 +15,8 @@ import android.bluetooth.BluetoothSocket;
 import android.util.Log;
 
 public class ObdManager {
+	private static final String ADAPTER_NAME = "OBDII";
+	
 	private final Set<OnChangedListener> listeners;
 
 	private BluetoothAdapter bluetoothAdapter;
@@ -79,24 +81,32 @@ public class ObdManager {
 	public void Connect() {
 		class BtConnector implements Runnable {
 			public void run() {
+				obdDongle = null;
+				
 				bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 				Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
 				for (BluetoothDevice device : pairedDevices) {
 					Log.i("AutoHud", "Found Paired Device" + device.getName());
-					if (device.getName().equals(R.string.obd_adapter_name)) {
+					if (device.getName().equals(ADAPTER_NAME)) {
 						Log.i("AutoHud", "That's our man");
 						obdDongle = device;
 					}
+				}
+				
+				if (obdDongle == null) {
+					Log.d("VSQuest", "OBD Dongle not found. Check if it's paired, in range, and that the ADAPTER_NAME constant in ObdManager.java is correct.");
+					return;
 				}
 
 				try {
 					sppSocket = obdDongle.createRfcommSocketToServiceRecord(UUID.fromString("00001101-0000-1000-8000-00805F9B34FB")); // Magic Number UUID for SPP
 				}
 				catch (Exception e){
-					Log.e("AutoHud", "UUID is bad or couldn't connect. Sucks to be you");
+					Log.e("AutoHud", "Couldn't create RFCOMM socket. Sucks to be you");
+					return;
 				}
 
-				Log.i("AutoHud", "Connecting to SPP");
+				Log.i("AutoHud", "Connecting to SPP...");
 
 				try {
 					bluetoothAdapter.cancelDiscovery();
@@ -104,6 +114,7 @@ public class ObdManager {
 				}
 				catch (IOException e) {
 					Log.e("AutoHud", "Failed to connect - IOException");
+					return;
 				}
 
 				Log.i("AutoHud", "Connected..?");
@@ -114,6 +125,7 @@ public class ObdManager {
 				}
 				catch (IOException e) {
 					Log.e("AutoHud", "Failed to open Rx and/or Tx");
+					return;
 				}
 				
 				generateObdCommunicator();

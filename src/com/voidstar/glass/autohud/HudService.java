@@ -68,18 +68,17 @@ public class HudService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (mLiveCard == null) {
-            mLiveCard = mTimelineManager.getLiveCard(LIVE_CARD_ID);
+            mLiveCard = mTimelineManager.createLiveCard(LIVE_CARD_ID);
             mRenderer = new HudRenderer(this, mObdManager);
 
-            mLiveCard.enableDirectRendering(true).getSurfaceHolder().addCallback(mRenderer);
-            mLiveCard.setNonSilent(true);
+            mLiveCard.setDirectRenderingEnabled(true).getSurfaceHolder().addCallback(mRenderer);
 
             // Display the options menu when the live card is tapped.
             Intent menuIntent = new Intent(this, MenuActivity.class);
             menuIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             mLiveCard.setAction(PendingIntent.getActivity(this, 0, menuIntent, 0));
 
-            mLiveCard.publish();
+            mLiveCard.publish(LiveCard.PublishMode.REVEAL);
         }
 
         return START_STICKY;

@@ -102,7 +102,8 @@ public class ObdManager {
 					sppSocket = obdDongle.createRfcommSocketToServiceRecord(UUID.fromString("00001101-0000-1000-8000-00805F9B34FB")); // Magic Number UUID for SPP
 				}
 				catch (Exception e){
-					Log.e("AutoHud", "Couldn't create RFCOMM socket. Sucks to be you");
+					//Log.e("AutoHud", "Couldn't create RFCOMM socket. Sucks to be you");
+					e.printStackTrace();
 					return;
 				}
 
@@ -113,7 +114,8 @@ public class ObdManager {
 					sppSocket.connect();
 				}
 				catch (IOException e) {
-					Log.e("AutoHud", "Failed to connect - IOException");
+					//Log.e("AutoHud", "Failed to connect - IOException");
+					e.printStackTrace();
 					return;
 				}
 
@@ -124,7 +126,8 @@ public class ObdManager {
 					sppTx = new BufferedOutputStream(sppSocket.getOutputStream());
 				}
 				catch (IOException e) {
-					Log.e("AutoHud", "Failed to open Rx and/or Tx");
+					//Log.e("AutoHud", "Failed to open Rx and/or Tx");
+					e.printStackTrace();
 					return;
 				}
 				
@@ -161,7 +164,8 @@ public class ObdManager {
 			}
 		}
 		catch (IOException e) {
-			Log.e("AutoHud", "Closing sockets failed");
+			//Log.e("AutoHud", "Closing sockets failed");
+			e.printStackTrace();
 		}
 
 		Log.i("AutoHud", "Closed sockets");
@@ -221,8 +225,9 @@ public class ObdManager {
 					lastRead = sppRx.read();
 				}
 				catch (IOException e) {
-					Log.e("AutoHud", "IOException while reading from RX buffer");
-					Log.e("AutoHud", e.getLocalizedMessage());
+					//Log.e("AutoHud", "IOException while reading from RX buffer");
+					//Log.e("AutoHud", e.getLocalizedMessage());
+					e.printStackTrace();
 				}
 
 				if (lastRead == -1) continue;
@@ -347,7 +352,7 @@ public class ObdManager {
 				sppTx.write('\r');
 				sppTx.flush();
 			}
-			catch (IOException e) { Log.e("AutoHud", e.getLocalizedMessage()); }
+			catch (IOException e) { e.printStackTrace(); /*Log.e("AutoHud", e.getLocalizedMessage());*/ }
 		}
 	}
 

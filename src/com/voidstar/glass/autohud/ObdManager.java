@@ -142,10 +142,23 @@ public class ObdManager {
 
 	public void Disconnect() {
 		try {
+			Log.d("AutoHud", "Preparing to disconnect. isAlive == false");
 			isAlive = false;
-			if (sppRx != null) sppRx.close();
-			if (sppTx != null) sppTx.close();
-			if (sppSocket != null) sppSocket.close();
+			
+			if (sppRx != null) {
+				sppRx.close();
+				Log.d("AutoHud", "Closed SPP RX");
+			}
+			
+			if (sppTx != null) {
+				sppTx.close();
+				Log.d("AutoHud", "Closed SPP TX");
+			}
+			
+			if (sppSocket != null) {
+				sppSocket.close();
+				Log.d("AutoHud", "Closed SPP socket");
+			}
 		}
 		catch (IOException e) {
 			Log.e("AutoHud", "Closing sockets failed");
@@ -223,8 +236,8 @@ public class ObdManager {
 
 					Sentences.add(activeSentence.toString());
 
-					//Log.i("AutoHud", "Adding new sentence to Sentences. Sentence is:");
-					//Log.i("AutoHud", activeSentence.toString());
+					Log.i("AutoHud", "Adding new sentence to Sentences. Sentence is:");
+					Log.i("AutoHud", activeSentence.toString());
 
 					activeSentence.delete(0, activeSentence.length() + 1);
 				}
@@ -232,11 +245,11 @@ public class ObdManager {
 					continue;
 				}
 				else if (lastChar == '>') {
-					//Log.i("AutoHud", "Received >, Ready for new command");
+					Log.i("AutoHud", "Received >, Ready for new command");
 					IsReadyForCommand = true;
 				}
 				else {
-					//Log.d("AutoHud", "Rx Char: " + lastChar);
+					Log.d("AutoHud", "Rx Char: " + lastChar);
 					activeSentence.append(lastChar);
 				}
 
@@ -329,7 +342,7 @@ public class ObdManager {
 		
 		private void println(String command) {
 			try {
-				//Log.i("AutoHud", "Printing command " + command);
+				Log.i("AutoHud", "Printing command " + command);
 				sppTx.write(command.getBytes());
 				sppTx.write('\r');
 				sppTx.flush();

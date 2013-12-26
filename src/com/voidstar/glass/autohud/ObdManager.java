@@ -337,6 +337,15 @@ public class ObdManager {
 							notifyMpgChanged();
 							nextStatToUpdate = TACH;
 						}
+					} else if (words[0].equals("NO")) {
+						// NO DATA. going to bump to the next thing to read.
+						// other options.. do this in all above cycles..
+						// other: make an array and next the array maybe
+						nextStatToUpdate = (nextStatToUpdate<<1)%32;
+						// quick hack - if it's looped due to mod, don't do capabilites, lets go to 1 instead.
+						if (nextStatToUpdate == 0) {
+							nextStatToUpdate = 1;
+						}
 					}
 
 					Sentences.remove(0);

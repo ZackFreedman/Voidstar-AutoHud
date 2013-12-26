@@ -337,15 +337,29 @@ public class ObdManager {
 							notifyMpgChanged();
 							nextStatToUpdate = TACH;
 						}
-					} else if (words[0].equals("NO")) {
+					} else if (words[0].equals("NO") && words[1].equals("DATA")) {
+						Log.e("AutoHud", "NO DATA returned for stat " + Integer.toString(nextStatToUpdate));
+						
 						// NO DATA. going to bump to the next thing to read.
 						// other options.. do this in all above cycles..
 						// other: make an array and next the array maybe
-						nextStatToUpdate = (nextStatToUpdate<<1)%32;
-						// quick hack - if it's looped due to mod, don't do capabilites, lets go to 1 instead.
-						if (nextStatToUpdate == 0) {
-							nextStatToUpdate = 1;
+						nextStatToUpdate = (nextStatToUpdate << 1) % 32;
+						
+						// If it ends up on an invalid stat, or one that shouldn't be read multiple times,
+						// loop back to reading the tachometer
+						if (nextStatToUpdate != TACH &&
+							nextStatToUpdate != SPEED &&
+							nextStatToUpdate != FUEL &&
+							nextStatToUpdate != MAF) {
+								nextStatToUpdate = TACH;
 						}
+						
+						// TODO: Switch nextStatToUpdate to an enum and/or dictionary with strings
+						// TODO: Take advantage of deterministic behavior of ELM327 to simplify flow
+						// TODO: Add error checking and timeouts to figure out when OBD connection drops
+						// TODO: Add conditions to find Bluetooth connection drops
+						// TODO: Check Capabilities bits to figure out in advance if each stat will work
+						// TODO: Add error handling if Capabilities or Protocol return NO DATA
 					}
 
 					Sentences.remove(0);
